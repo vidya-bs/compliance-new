@@ -1,0 +1,732 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "TeleCustomerNetwork",
+    "version" : "1.0.0",
+    "description" : "An example OpenAPI specification for a Telco domain."
+  },
+  "x-ibm-configuration" : {
+    "enforced" : true,
+    "testable" : true,
+    "phase" : "realized",
+    "cors" : {
+      "enabled" : false
+    },
+    "assembly" : {
+      "execute" : [ {
+        "json-to-xml" : {
+          "version" : "1.0.0",
+          "title" : "JSON to XML transform",
+          "description" : "Transforms JSON message body to XML format"
+        }
+      }, {
+        "oauth" : {
+          "version" : "2.0.0",
+          "title" : "my-oauth-policy",
+          "oauth-provider-settings-ref" : "delta",
+          "default" : "my-oauth"
+        }
+      }, {
+        "log.to.k2" : {
+          "LogDetail" : false,
+          "GALOriginalDestination" : "KPORG-DFC-SJ001-dfc-bff-getdocumentlist_DP_KPCanonicalXML",
+          "version" : "1.0.0",
+          "ApplicationName" : "dfc-bff-getdocumentlist"
+        }
+      }, {
+        "simple.routing.rule.for.restapi" : {
+          "Region" : "NATL",
+          "version" : "1.0.0"
+        }
+      }, {
+        "proxy" : {
+          "title" : "proxy",
+          "timeout" : 120,
+          "verb" : "keep",
+          "cache-response" : "no-cache",
+          "cache-ttl" : 900,
+          "version" : "1.0.0",
+          "target-url" : "$(backend-url)$(api.operation.path)",
+          "tls-profile" : "tlsbackendprod",
+          "authz_uri" : "https://artifactory-fof.appl.kp.org/artifactory/api/npm/npm-release",
+          "invoke_policy" : "test"
+        }
+      }, {
+        "decrypt.pcitoken" : {
+          "version" : "1.1.0"
+        }
+      }, {
+        "validate.xguid" : {
+          "version" : "1.0.0"
+        }
+      }, {
+        "activity-log" : {
+          "title" : "activity-log",
+          "content" : "activity",
+          "error-content" : "activity",
+          "version" : "1.0.0"
+        }
+      }, {
+        "aaa.using.basic_auth" : {
+          "version" : "1.0.0"
+        }
+      } ]
+    }
+  },
+  "servers" : [ {
+    "url" : "https://mock.apiwiz.io/v1",
+    "x-name" : "prod",
+    "x-schema" : "https://",
+    "x-hostName" : "mock.apiwiz.io",
+    "x-basePath" : "/v1"
+  }, {
+    "x-name" : "uat",
+    "x-schema" : "https://",
+    "x-hostName" : "uat-api.apiwiz.io",
+    "url" : "https://uat-api.apiwiz.io/oauth2/v1",
+    "x-basePath" : "/oauth2/v1"
+  }, {
+    "x-name" : "production",
+    "x-schema" : "https://",
+    "x-hostName" : "uat-api.apiwiz.io",
+    "url" : "https://uat-api.apiwiz.io/v1",
+    "x-basePath" : "/v1"
+  } ],
+  "paths" : {
+    "/customers" : {
+      "get" : {
+        "summary" : "Get a list of customers",
+        "responses" : {
+          "200" : {
+            "description" : "A list of customers",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GetModelResp"
+                }
+              }
+            }
+          }
+        },
+        "operationId" : "getCustomerList",
+        "description" : "Get a list of customers",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          }
+        }, {
+          "name" : "x-tenant",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          },
+          "example" : "f8fda8f5-2f08-457b-95ea-0a232c51b850"
+        } ],
+        "security" : [ {
+          "Oauth" : [ "get" ]
+        } ]
+      },
+      "post" : {
+        "summary" : "Create a new customer",
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PostReq"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Customer created successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PostResp"
+                }
+              }
+            }
+          }
+        },
+        "operationId" : "addNewCustomer",
+        "description" : "Create a new customer",
+        "parameters" : [ {
+          "name" : "Content-Type",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/customers/{customerId}" : {
+      "parameters" : [ {
+        "name" : "customerId",
+        "in" : "path",
+        "required" : true,
+        "schema" : {
+          "type" : "integer"
+        }
+      } ],
+      "put" : {
+        "summary" : "Update customer details by ID",
+        "parameters" : [ {
+          "name" : "customerId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "name" : "Content-Type",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PutReq"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Customer details updated successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PutResp"
+                }
+              }
+            }
+          }
+        },
+        "operationId" : "updateCustomerById",
+        "description" : "Update customer details by ID"
+      },
+      "delete" : {
+        "summary" : "Delete customer by ID",
+        "parameters" : [ {
+          "name" : "customerId",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer"
+          },
+          "style" : "simple"
+        }, {
+          "name" : "Content-Type",
+          "required" : false,
+          "style" : "simple",
+          "in" : "header",
+          "schema" : {
+            "description" : "",
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Customer deleted successfully",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "description" : "",
+                  "$ref" : "#/components/schemas/DeleteResp"
+                }
+              }
+            }
+          }
+        },
+        "operationId" : "deleteCustomerById",
+        "description" : "Delete customer by ID"
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Customer" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "phone_number" : {
+            "type" : "string"
+          },
+          "address" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PhoneModel" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "brand" : {
+            "type" : "string"
+          },
+          "model" : {
+            "type" : "string"
+          }
+        }
+      },
+      "GetModelResp" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "example" : 1
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "John Doe"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "johndoe@example.com"
+          },
+          "phone_number" : {
+            "type" : "string",
+            "example" : "123-456-7890"
+          },
+          "address" : {
+            "type" : "string",
+            "example" : "123 Main St, City, Country"
+          }
+        }
+      },
+      "PostReq" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "example" : 2
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "Jane Smith"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "janesmith@example.com"
+          },
+          "phone_number" : {
+            "type" : "string",
+            "example" : "987-654-3210"
+          },
+          "address" : {
+            "type" : "string",
+            "example" : "456 Elm St, Town, Country"
+          }
+        }
+      },
+      "PostResp" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "example" : 2
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "Jane Smith"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "janesmith@example.com"
+          },
+          "phone_number" : {
+            "type" : "string",
+            "example" : "987-654-3210"
+          },
+          "address" : {
+            "type" : "string",
+            "example" : "456 Elm St, Town, Country"
+          }
+        }
+      },
+      "PutReq" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "example" : 1
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "John Doe (Updated)"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "john.updated@example.com"
+          },
+          "phone_number" : {
+            "type" : "string",
+            "example" : "555-555-5555"
+          },
+          "address" : {
+            "type" : "string",
+            "example" : "789 Oak St, Village, Country"
+          }
+        }
+      },
+      "PutResp" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "example" : 1
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "John Doe (Updated)"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "john.updated@example.com"
+          },
+          "phone_number" : {
+            "type" : "string",
+            "example" : "555-555-5555"
+          },
+          "address" : {
+            "type" : "string",
+            "example" : "789 Oak St, Village, Country"
+          }
+        }
+      },
+      "DeleteResp" : {
+        "type" : "object",
+        "properties" : {
+          "description" : {
+            "type" : "string",
+            "example" : "Customer deleted successfully"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "Oauth" : {
+        "type" : "oauth2",
+        "description" : "",
+        "flows" : {
+          "clientCredentials" : {
+            "tokenUrl" : "https://demo-api.apiwiz.io/oauth2/v1/access_token?grant_type=client_credentials",
+            "scopes" : {
+              "get" : "Get a list of customers"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-policies" : [ {
+    "type" : "security",
+    "name" : "Security",
+    "description" : "Security policies let you control access to your APIs with OAuth, API key validation, and other threat protection features.",
+    "policies" : [ {
+      "name" : "validateOauthToken",
+      "displayName" : "OAuth",
+      "description" : "Secure APIs with OAuth",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "cors",
+      "displayName" : "CORS",
+      "description" : "Enable API’s to support Cross-Origin Resource Sharing requests",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "accesscontrol",
+      "displayName" : "IP Access Control",
+      "description" : "Lets you allow or deny access to your APIs by specific IP addresses. ",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "verifyapikey",
+      "displayName" : "Verify API Key",
+      "description" : "Lets you enforce verification of API keys at runtime.",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "googleIDToken",
+      "displayName" : "Google ID Token for Target Server",
+      "description" : "Lets you authenticate using Google authentication.",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "clientinfo",
+      "displayName" : "clientinfo",
+      "description" : "client information",
+      "enabled" : false,
+      "applyToFlow" : true
+    }, {
+      "name" : "tonikusertoken",
+      "displayName" : "tonikusertoken",
+      "description" : "tonik user token",
+      "enabled" : false,
+      "applyToFlow" : true
+    } ]
+  }, {
+    "type" : "errorHandler",
+    "name" : "Custom Error Handler",
+    "description" : "Policy templates related to custom fault handling",
+    "policies" : [ {
+      "name" : "targetErrorHandler",
+      "displayName" : "Target Error Handler",
+      "description" : "Policy to handle custom error handling for target servers",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "flowErrorHandler",
+      "displayName" : "Error Handler",
+      "description" : "Policy to handle custom error handling",
+      "enabled" : false,
+      "applyToFlow" : true
+    } ]
+  }, {
+    "type" : "messageValidation",
+    "name" : "Message Validation",
+    "description" : "Validate Request/Response mandatory header and payload",
+    "policies" : [ {
+      "name" : "requestHeaderCheck",
+      "displayName" : "Validate Mandatory Header",
+      "description" : "Check proxy mandatory header fields",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "paylaodValidation",
+      "displayName" : "Validate Request Payload",
+      "description" : "Proxy request schema validation",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "authHeaderCheck",
+      "displayName" : "Validate Mandatory Auth Header",
+      "description" : "Check proxy mandatory authorization header fields",
+      "enabled" : true,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "mediation",
+    "name" : "Mediation",
+    "description" : "Mediation policies let you perform message transformation, parsing, and validation, as well as raise faults and alerts.",
+    "policies" : [ {
+      "name" : "jsontoxml",
+      "displayName" : "JSON To XML",
+      "description" : "Converts messages from the JavaScript Object Notation (JSON) format to extensible markup language (XML) ",
+      "enabled" : true,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "threatprotection",
+    "name" : "Threat Management",
+    "description" : "Threat management allow you to scan the incoming payloads for any miscellaneous content in the request.",
+    "policies" : [ {
+      "name" : "jsonThreat",
+      "displayName" : "JSON Threat Injection",
+      "description" : "Enable payload scan for JSON content",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "xssThreat",
+      "displayName" : "XSS Injection",
+      "description" : "Scans XSS threats in request header, URI, payload",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "xmlThreat",
+      "displayName" : "XML Threat Injection",
+      "description" : "Enable payload scan for XML content",
+      "enabled" : false,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "logging",
+    "name" : "Logging",
+    "description" : "Logging policies allow you to log the request data and response data.",
+    "policies" : [ {
+      "name" : "log",
+      "displayName" : "Logger Handler",
+      "description" : "Lets you to log the proxy data during runtime.",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "generateCorrelationId",
+      "displayName" : "Generate Correlation ID",
+      "description" : "Generate unique correlation Id for E2E tracking",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "generateFlowName",
+      "displayName" : "Track Current Execution Flow Name",
+      "description" : "Define and track apigee’s current proxy execution flow name",
+      "enabled" : true,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "trafficmanagement",
+    "name" : "TrafficManagement",
+    "description" : "Traffic management policies let you configure cache, control traffic quotas and spikes, set concurrent rate limits, and so on.",
+    "policies" : [ {
+      "name" : "spikeArrestEnv",
+      "displayName" : "Spike Arrest at Environment",
+      "description" : "Spike Arrest policy protects against traffic spikes.",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "quotaAtProduct",
+      "displayName" : "Quota at Product Level",
+      "description" : "Quota policy to configure the number of request messages that an API proxy allows over a period of time.",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "spikeArrestProxy",
+      "displayName" : "Spike Arrest at Proxy",
+      "description" : "Spike Arrest policy protects against traffic spikes.",
+      "enabled" : false,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "routing",
+    "name" : "Target Server Routing Handler",
+    "description" : "Endpoint routing for Tonik micro-services",
+    "policies" : [ {
+      "name" : "disablePathsuffix",
+      "displayName" : "Disable Proxy Base Pathsuffix",
+      "description" : "Disable pathsuffix for target routing rule",
+      "enabled" : false,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "custom",
+    "name" : "Custom Policies",
+    "description" : "Custom related policies",
+    "policies" : [ {
+      "name" : "encodeVariable",
+      "displayName" : "Encode Variable",
+      "description" : "Policy to encode any variable with Base64 encoding",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "decodeVariable",
+      "displayName" : "Decode Variable",
+      "description" : "Policy to decode any variable with Base64 decoding",
+      "enabled" : false,
+      "applyToFlow" : false
+    }, {
+      "name" : "removeAuthHeader",
+      "displayName" : "Remove Proxy Auth Header",
+      "description" : "Policy to remove proxy auth header before routing to target server",
+      "enabled" : true,
+      "applyToFlow" : false
+    }, {
+      "name" : "customAnalytics",
+      "displayName" : "Proxy Custom Analytics",
+      "description" : "Policy to capture custom analytics",
+      "enabled" : true,
+      "applyToFlow" : false
+    } ]
+  }, {
+    "type" : "compliance",
+    "name" : "Compliance",
+    "description" : "Detect Compliance",
+    "policies" : [ {
+      "name" : "complianceCall",
+      "displayName" : "ComplianceCall",
+      "description" : "call to compliance",
+      "enabled" : true,
+      "applyToFlow" : false
+    } ]
+  } ],
+  "x-proxymetadata" : {
+    "json-to-xml" : [ {
+      "version" : "1.0.0",
+      "title" : "JSON to XML transform",
+      "description" : "Transforms JSON message body to XML format"
+    } ],
+    "proxy" : [ {
+      "title" : "proxy",
+      "timeout" : 120,
+      "verb" : "keep",
+      "cache-response" : "no-cache",
+      "cache-ttl" : 900,
+      "version" : "1.0.0",
+      "target-url" : "$(backend-url)$(api.operation.path)",
+      "tls-profile" : "tlsbackendprod",
+      "authz_uri" : "https://artifactory-fof.appl.kp.org/artifactory/api/npm/npm-release",
+      "invoke_policy" : "test"
+    } ],
+    "cors" : {
+      "enabled" : false
+    },
+    "logs" : [ {
+      "title" : "activity-log",
+      "content" : "activity",
+      "error-content" : "activity",
+      "version" : "1.0.0"
+    } ],
+    "oauth" : [ {
+      "version" : "2.0.0",
+      "title" : "my-oauth-policy",
+      "oauth-provider-settings-ref" : "delta",
+      "default" : "my-oauth"
+    } ]
+  },
+  "tags" : [ ],
+  "security" : [ ],
+  "x-mock" : true,
+  "x-metadata" : {
+    "metadata" : {
+      "swaggerName" : "eaad2201ab4e4c7c87b8f4da86e033b4",
+      "revision" : 1,
+      "documentation" : [ ],
+      "category" : [ {
+        "name" : "Unsorted",
+        "paths" : [ "/customers", "/customers/{customerId}" ]
+      } ]
+    }
+  }
+}
